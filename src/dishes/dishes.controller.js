@@ -11,17 +11,27 @@ const nextId = require("../utils/nextId");
 function create (req, res) {
   const { data: { name, description, price, image_url } = {} } = req.body;
   const newDish = { 
-    id: nextId,
+    id: nextId(),
     name: name,
     description: description ,
     price: price,
     image_url: image_url,
   };
-  urls.push(newDish);
+  console.log(newDish)
+  dishes.push(newDish);
   res.status(201).json({ data: newDish})
 }
 
+function hasText(req, res, next) {
+const { data: { name, description, price, image_url } = {} } = req.body;
+
+if ( name && description && price > 0 && image_url) {
+  return next();
+}
+next({ status: 400, message: "All property is required '(name, description, price, image_url)'." });
+}
+
 module.exports = {
-  create: [create],
+  create: [hasText, create],
   
 }

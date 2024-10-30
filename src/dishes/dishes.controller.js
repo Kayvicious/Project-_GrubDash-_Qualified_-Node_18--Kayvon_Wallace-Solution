@@ -31,7 +31,11 @@ if ( name && description && price > 0 && image_url) {
 next({ status: 400, message: "All property is required '(name, description, price, image_url)'." });
 }
 
+function list(req, res) {
+  res.json({ data: dishes });
+}
+
 module.exports = {
   create: [hasText, create],
-  
+  list,
 }

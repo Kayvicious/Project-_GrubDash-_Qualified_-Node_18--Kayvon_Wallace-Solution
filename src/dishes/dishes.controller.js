@@ -17,18 +17,17 @@ function create (req, res) {
     price: price,
     image_url: image_url,
   };
-  console.log(newDish)
   dishes.push(newDish);
   res.status(201).json({ data: newDish})
 }
 
 function hasText(req, res, next) {
-const { data: { name, description, price, image_url } = {} } = req.body;
+  const { data: { name, description, price, image_url } = {} } = req.body;
 
-if ( name && description && price > 0 && image_url) {
-  return next();
-}
-next({ status: 400, message: "All property is required '(name, description, price, image_url)'." });
+  if ( name && description && price > 0 && image_url) {
+    return next();
+  }
+  next({ status: 400, message: "All property is required '(name, description, price, image_url)'." });
 }
 
 function dishExists (req, res, next) {
@@ -53,8 +52,30 @@ function read (req, res) {
   res.json({data: res.locals.dish})
 }
 
+function update(req, res, next) {
+  const { dishId } = req.params;
+  const { data: {id, name, description, price, image_url} = {} } = req.body;
+  // Check if the id in the request body matches the dishId in the route
+  if (id && id !== dishId) {
+    return next({ 
+      status: 400, 
+      message: `Dish id does not match route id. Dish: ${id}, Route: ${dishId}.`
+    });
+  }
+  
+  if (res.locals.dish && name && description && price > 0 && image_url) {
+    res.locals.dish.name = name;
+    res.locals.dish.description = description;
+    res.locals.dish.price = Number(price);
+    res.locals.dish.image_url = image_url;
+    res.json({ data: res.locals.dish });
+  }
+  next({ status: 400, message: "All property is required '(name, description, price, image_url)'." })
+}
+
 module.exports = {
   create: [hasText, create],
   list,
-  read: [dishExists, read]
+  read: [dishExists, read],
+  update: [dishExists, hasText, update],
 }

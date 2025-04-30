@@ -77,10 +77,6 @@ function read(req, res) {
   res.json({ data: res.locals.order });
 }
 
-function read(req, res) {
-  res.json({ data: res.locals.order });
-}
-
 function update(req, res, next) {
   const { orderId } = req.params;
   const { data: {id, deliverTo, mobileNumber, status, dishes } = {}} = req.body;
@@ -104,8 +100,29 @@ function update(req, res, next) {
   res.json({ data: res.locals.order})
 }
 
+function list(req, res) {
+  res.json({ data: orders });
+}
+
+function destroy(req, res, next) {
+  const { orderId } = req.params;
+  const index = orders.findIndex((order) => order.id === orderId);
+  if (index > -1) {
+    orders.splice(index, 1);
+  }
+   if (res.locals.order.status !== "pending") {
+    return next({ status: 400, message: "Order status is pending" });
+  }
+  
+  res.sendStatus(204);
+ 
+
+}
+
 module.exports = {
   create: [hasText(false), create],
   read: [orderExist, read],
   update: [orderExist, hasText(true), update],    
+  delete: [orderExist, destroy],
+  list
 }

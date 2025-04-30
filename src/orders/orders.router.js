@@ -7,7 +7,8 @@ router
   .route("/:orderId")
   .get(controller.read)
   .put(controller.update)
+  .delete(controller.delete).all(methodNotAllowed)
 
-router.route("/").post(controller.create);
+router.route("/").get(controller.list).post(controller.create).all(methodNotAllowed);
 
 module.exports = router;

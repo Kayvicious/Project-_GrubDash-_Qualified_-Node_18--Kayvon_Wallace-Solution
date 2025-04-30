@@ -31,11 +31,30 @@ if ( name && description && price > 0 && image_url) {
 next({ status: 400, message: "All property is required '(name, description, price, image_url)'." });
 }
 
+function dishExists (req, res, next) {
+  const dishId = req.params.dishId;
+  const foundDish = dishes.find((dish) => dish.id === dishId);
+  if (foundDish) {
+    res.locals.dish = foundDish;
+    return next();
+  }
+  next({
+    status: 404,
+    message: req.params.dishId
+  });
+} 
+
 function list(req, res) {
   res.json({ data: dishes });
+}
+
+function read (req, res) {
+  dishes.push(res.locals.dish)
+  res.json({data: res.locals.dish})
 }
 
 module.exports = {
   create: [hasText, create],
   list,
+  read: [dishExists, read]
 }

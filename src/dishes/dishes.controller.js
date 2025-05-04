@@ -24,7 +24,7 @@ function create (req, res) {
 function hasText(req, res, next) {
   const { data: { name, description, price, image_url } = {} } = req.body;
 
-  if ( name && description && price > 0 && image_url) {
+  if ( name && description && price > 0 && Number.isInteger(price) && image_url) {
     return next();
   }
   next({ status: 400, message: "All property is required '(name, description, price, image_url)'." });
